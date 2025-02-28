@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверочный лист</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Проверочный лист</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="journal.html">Журнал посещений</a></li>
+                <li><a href="analytics.html">Аналитика</a></li>
+                <li><a href="admin.html">Администрирование</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section>
+        <h2>Форма проверки</h2>
+        <form>
+            <label>Дата посещения:
+                <input type="date" name="visit_date">
+            </label>
+            <label>Адрес объекта:
+                <input type="text" name="address" placeholder="Введите адрес">
+            </label>
+            <label>Ф.И.О. инструктируемого:
+                <input type="text" name="instructed_person" placeholder="Введите Ф.И.О.">
+            </label>
+            <label>Категория граждан:
+                <select name="category">
+                    <option>Многодетная семья</option>
+                    <option>Малоимущие семьи</option>
+                    <option>Пенсионеры</option>
+                    <option>Инвалиды</option>
+                    <option>Одиноко проживающие</option>
+                </select>
+            </label>
+            <h3>Требования пожарной безопасности</h3>
+            <label><input type="checkbox" name="fire_safety" value="1"> Наличие огнетушителя</label>
+            <label><input type="checkbox" name="fire_safety" value="2"> Исправность электропроводки</label>
+            <label><input type="checkbox" name="fire_safety" value="3"> Безопасное использование газового оборудования</label>
+            <label><input type="checkbox" name="fire_safety" value="4"> Наличие плана эвакуации</label>
+            <label><input type="checkbox" name="fire_safety" value="5"> Обучение членов семьи правилам ПБ</label>
+            <label>Загрузить проверочный лист (Excel):
+                <input type="file" id="uploadExcel" accept=".xlsx, .xls">
+            </label>
+            <div id="excelData"></div>
+            <button type="submit">Сохранить</button>
+        </form>
+    </section>
+    <footer>
+        <p>&copy; 2025 ДЧС СКО. Все права защищены.</p>
+    </footer>
+    <script>
+        document.querySelector("form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Отмена стандартной отправки формы
+    
+            // Получаем данные формы
+            const visitDate = document.querySelector('input[name="visit_date"]').value;
+            const address = document.querySelector('input[name="address"]').value;
+            const instructedPerson = document.querySelector('input[name="instructed_person"]').value;
+            const category = document.querySelector('select[name="category"]').value;
+    
+            // Собираем данные о пожарной безопасности
+            const fireSafetyChecks = [];
+            document.querySelectorAll('input[name="fire_safety"]:checked').forEach(checkbox => {
+                fireSafetyChecks.push(checkbox.nextSibling.textContent.trim());
+            });
+    
+            // Создаём объект записи
+            const visitRecord = {
+                visitDate,
+                address,
+                instructedPerson,
+                category,
+                fireSafetyChecks,
+                status: "Не проверено" // Начальный статус
+            };
+    
+            // Загружаем старые данные, добавляем новую запись и сохраняем обратно
+            let records = JSON.parse(localStorage.getItem("visitRecords")) || [];
+            records.push(visitRecord);
+            localStorage.setItem("visitRecords", JSON.stringify(records));
+    
+            alert("Запись сохранена!");
+            this.reset(); // Очистка формы
+        });
+    </script>
+    
+</body>
+</html>

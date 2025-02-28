@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Журнал посещений</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Журнал посещений</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="checklist.html">Проверочный лист</a></li>
+                <li><a href="analytics.html">Аналитика</a></li>
+                <li><a href="admin.html">Администрирование</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section>
+        <h2>Записи журнала</h2>
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>Дата</th>
+                    <th>Адрес</th>
+                    <th>Ф.И.О. инструктируемого</th>
+                    <th>Категория граждан</th>
+                    <th>Детали</th>
+                    <th>Результат</th>
+                    <th>Действия</th>
+                </tr>
+            </table>
+        </div>
+    </section>
+    <footer>
+        <p>&copy; 2025 ДЧС СКО. Все права защищены.</p>
+    </footer>
+    <style>
+        /* Стили для кнопки удаления */
+        .delete-btn {
+            background-color: #d93636;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Стили для подтверждения удаления */
+        .confirm-delete {
+            background-color: #d93636;
+        }
+
+        /* Эффект удаления строки */
+        .fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const records = JSON.parse(localStorage.getItem("visitRecords")) || [];
+            const table = document.querySelector("table");
+
+            records.forEach((record, index) => {
+                const row = table.insertRow(-1);
+
+                row.insertCell(0).textContent = record.visitDate;
+                row.insertCell(1).textContent = record.address;
+                row.insertCell(2).textContent = record.instructedPerson;
+                row.insertCell(3).textContent = record.category;
+
+                // Ячейка для требований пожарной безопасности
+                const safetyCell = row.insertCell(4);
+                safetyCell.textContent = record.fireSafetyChecks.length > 0 ? record.fireSafetyChecks.join(", ") : "Нет данных";
+
+                // Кнопка изменения статуса
+                const statusCell = row.insertCell(5);
+                const statusButton = document.createElement("button");
+                statusButton.textContent = record.status;
+                statusButton.addEventListener("click", function () {
+                    record.status = record.status === "Проверено" ? "Не проверено" : "Проверено";
+                    statusButton.textContent = record.status;
+                    localStorage.setItem("visitRecords", JSON.stringify(records));
+                });
+                statusCell.appendChild(statusButton);
+
+                // Кнопка удаления строки
+                const deleteCell = row.insertCell(6);
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Удалить";
+                deleteButton.className = "delete-btn";
+
+                deleteButton.addEventListener("click", function () {
+                    if (!deleteButton.classList.contains("confirm-delete")) {
+                        deleteButton.textContent = "Подтвердить удаление";
+                        deleteButton.classList.add("confirm-delete");
+                        setTimeout(() => {
+                            deleteButton.textContent = "Удалить";
+                            deleteButton.classList.remove("confirm-delete");
+                        }, 3000); // Через 3 секунды кнопка сбросится
+                    } else {
+                        row.classList.add("fade-out");
+                        setTimeout(() => {
+                            records.splice(index, 1);
+                            localStorage.setItem("visitRecords", JSON.stringify(records));
+                            table.deleteRow(row.rowIndex);
+                        }, 500); // Через 0.5 секунды строка удаляется
+                    }
+                });
+
+                deleteCell.appendChild(deleteButton);
+            });
+        });
+    </script>
+</body>
+</html>

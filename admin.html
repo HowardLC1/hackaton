@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Администрирование</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Администрирование</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="checklist.html">Проверочный лист</a></li>
+                <li><a href="journal.html">Журнал посещений</a></li>
+                <li><a href="analytics.html">Аналитика</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section>
+        <h2>Управление пользователями</h2>
+        <form>
+            <label>Добавить нового пользователя:
+                <input type="text" name="new_user" placeholder="Ф.И.О.">
+            </label>
+            <label>Роль:
+                <select name="role">
+                    <option>Админ</option>
+                    <option>Сотрудник ГПС</option>
+                </select>
+            </label>
+            <button type="submit">Добавить</button>
+        </form>
+        <h2>Список пользователей</h2>
+        <table>
+            <tr>
+                <th>Ф.И.О.</th>
+                <th>Роль</th>
+                <th>Действия</th>
+            </tr>
+            <tr>
+
+            </tr>
+            <tr>
+
+            </tr>
+        </table>
+    </section>
+    <footer>
+        <p>&copy; 2025 ДЧС СКО. Все права защищены.</p>
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const userForm = document.querySelector("form");
+            const userTable = document.querySelector("table tbody");
+    
+            // Функция для удаления пользователя
+            function deleteUser(event) {
+                event.target.closest("tr").remove();
+            }
+    
+            // Обработчик добавления пользователя
+            userForm.addEventListener("submit", function (event) {
+                event.preventDefault(); // Останавливаем стандартное поведение формы
+    
+                const nameInput = document.querySelector("input[name='new_user']");
+                const roleInput = document.querySelector("select[name='role']");
+    
+                const userName = nameInput.value.trim();
+                const userRole = roleInput.value;
+    
+                if (userName === "") {
+                    alert("Введите Ф.И.О. пользователя!");
+                    return;
+                }
+    
+                // Создаем новую строку
+                const newRow = document.createElement("tr");
+                newRow.innerHTML = `
+                    <td>${userName}</td>
+                    <td>${userRole}</td>
+                    <td><button class="delete-btn">Удалить</button></td>
+                `;
+    
+                // Добавляем в таблицу
+                userTable.appendChild(newRow);
+    
+                // Добавляем обработчик удаления
+                newRow.querySelector(".delete-btn").addEventListener("click", deleteUser);
+    
+                // Очищаем поле ввода
+                nameInput.value = "";
+            });
+    
+            // Добавляем обработчики удаления к существующим пользователям
+            document.querySelectorAll(".delete-btn").forEach(button => {
+                button.addEventListener("click", deleteUser);
+            });
+        });
+    </script>
+
+</body>
+</html>

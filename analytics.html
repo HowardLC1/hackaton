@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аналитика</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Аналитика</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="checklist.html">Проверочный лист</a></li>
+                <li><a href="journal.html">Журнал посещений</a></li>
+                <li><a href="admin.html">Администрирование</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section>
+        <h2>Обзор данных</h2>
+        <div class="chart-container">
+            <canvas id="analyticsChart"></canvas>
+        </div>
+    </section>
+    <footer>
+        <p>&copy; 2025 ДЧС СКО. Все права защищены.</p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const records = JSON.parse(localStorage.getItem("visitRecords")) || [];
+
+            const categories = {
+                'Многодетные семьи': 0,
+                'Малоимущие семьи': 0,
+                'Пенсионеры': 0,
+                'Инвалиды': 0,
+                'Одиноко проживающие': 0
+            };
+
+            records.forEach(record => {
+                if (categories[record.category] !== undefined) {
+                    categories[record.category]++;
+                }
+            });
+
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(categories),
+                    datasets: [{
+                        label: 'Количество посещений',
+                        data: Object.values(categories),
+                        backgroundColor: 'rgba(211, 47, 47, 0.7)',
+                        borderColor: 'rgba(211, 47, 47, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Домашний Пожарный Контроль</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+</head>
+<body>
+    <header>
+        <h1>Домашний Пожарный Контроль (ДПК)</h1>
+        <nav>
+            <ul>
+                <li><a href="checklist.html">Проверочный лист</a></li>
+                <li><a href="journal.html">Журнал посещений</a></li>
+                <li><a href="analytics.html">Аналитика</a></li>
+                <li><a href="admin.html">Администрирование</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <section>
+        <h2>Карта</h2>
+        <div>
+            <input type="text" id="searchAddress" placeholder="Введите адрес для поиска">
+            <button onclick="searchLocation()">Поиск</button>
+        </div>
+        <div id="map" style="width: 100%; height: 400px;"></div>
+    </section>
+
+    <section id="checklist">
+        <h2>Проверочный лист</h2>
+        <form>
+            <label>Дата посещения: <input type="date" name="visit_date"></label>
+            <label>Адрес: <input type="text" name="address"></label>
+            <label>Состав семьи: <input type="text" name="family"></label>
+            <label>Категория граждан:
+                <select name="category">
+                    <option>Многодетная семья</option>
+                    <option>Малоимущие семьи</option>
+                    <option>Пенсионеры</option>
+                    <option>Инвалиды</option>
+                    <option>Одиноко проживающие</option>
+                </select>
+            </label>
+            <label>Ф.И.О. инструктируемого: <input type="text" name="instructed"></label>
+            <label>Ф.И.О. должностного лица: <input type="text" name="officer"></label>
+            <button type="submit">Сохранить</button>
+        </form>
+    </section>
+    <section id="journal">
+        <h2>Журнал посещений</h2>
+        <a href="journal.html"></a>
+        <p>Просмотр и экспорт данных в Excel.</p>
+    </section>
+    <section id="analytics">
+        <h2>Аналитика</h2>
+        <p>Географическая карта с результатами профилактической работы.</p>
+    </section>
+    <section id="admin">
+        <h2>Администрирование</h2>
+        <p>Настройки и управление пользователями.</p>
+    </section>
+    <footer>
+        <p>&copy; 2025 ДЧС СКО. Все права защищены.</p>
+    </footer>
+    
+    <script>
+        ymaps.ready(init);
+        function init() {
+            alert("Добро пожаловать! \n\nКликните по карте, чтобы добавить метку. \nНажмите на метку, чтобы удалить её.");
+    
+            var map = new ymaps.Map("map", {
+                center: [54.8753, 69.1676], // Центр Петропавловска
+                zoom: 13
+            });
+    
+            var placemarks = []; // Массив для хранения меток
+    
+            // Обработчик клика по карте
+            map.events.add("click", function (e) {
+                var coords = e.get("coords");
+                var placemark = new ymaps.Placemark(coords, {
+                    hintContent: "Новая метка",
+                    balloonContent: "<button class='delete-btn'>Удалить метку</button>"
+                }, {
+                    draggable: true
+                });
+                map.geoObjects.add(placemark);
+                placemarks.push(placemark);
+    
+                placemark.events.add("balloonopen", function () {
+                    setTimeout(() => {
+                        var button = document.querySelector(".delete-btn");
+                        if (button) {
+                            button.addEventListener("click", function () {
+                                map.geoObjects.remove(placemark);
+                                placemarks = placemarks.filter(p => p !== placemark);
+                            });
+                        }
+                    }, 500);
+                });
+            });
+    
+            // Функция поиска по адресу
+            window.searchLocation = function() {
+                var address = document.getElementById("searchAddress").value;
+                ymaps.geocode(address, { results: 1 }).then(function (res) {
+                    var firstGeoObject = res.geoObjects.get(0);
+                    if (firstGeoObject) {
+                        var coords = firstGeoObject.geometry.getCoordinates();
+                        map.setCenter(coords, 15);
+                        var placemark = new ymaps.Placemark(coords, {
+                            hintContent: "Найденный адрес",
+                            balloonContent: address
+                        });
+                        map.geoObjects.add(placemark);
+                    } else {
+                        alert("Адрес не найден!");
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
