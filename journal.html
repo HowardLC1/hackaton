@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Журнал посещений</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <header>
@@ -32,6 +33,7 @@
                     <th>Действия</th>
                 </tr>
             </table>
+            <button onclick="exportToExcel()" style="margin-top: 20px;">Экспорт в Excel</button>
         </div>
     </section>
     <footer>
@@ -114,6 +116,39 @@
                 deleteCell.appendChild(deleteButton);
             });
         });
+
+        function exportToExcel() {
+            // Получаем таблицу
+            const table = document.querySelector('table');
+            
+            // Создаем массив данных из таблицы
+            const data = [];
+            const rows = table.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('th, td').forEach(cell => {
+                    // Получаем текст из ячейки, исключая текст кнопок
+                    const buttons = cell.querySelectorAll('button');
+                    let cellText = cell.textContent;
+                    buttons.forEach(button => {
+                        cellText = cellText.replace(button.textContent, '');
+                    });
+                    rowData.push(cellText.trim());
+                });
+                data.push(rowData);
+            });
+            
+            // Создаем рабочую книгу Excel
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // Добавляем лист в книгу
+            XLSX.utils.book_append_sheet(wb, ws, "Журнал посещений");
+            
+            // Генерируем файл и скачиваем его
+            XLSX.writeFile(wb, "journal_" + new Date().toISOString().split('T')[0] + ".xlsx");
+        }
     </script>
 </body>
 </html>
